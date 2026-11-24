@@ -21,7 +21,7 @@ jobs:
           pip install -r Linux_Support/requirements.txt pytest
       - name: Test Linux_Support
         working-directory: Linux_Support
-        run: pytest tests
+        run: python -m pytest tests
       - name: Test Windows_Support
         working-directory: Windows_Support
-        run: pytest tests
+        run: python -m pytest tests
