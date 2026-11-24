@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 220" width="100%">
+  <defs>
+    <linearGradient id="bgGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#080b11"/>
+      <stop offset="55%" stop-color="#0f172a"/>
+      <stop offset="100%" stop-color="#080b11"/>
+    </linearGradient>
+    <linearGradient id="accentGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#00d9c0"/>
+      <stop offset="50%" stop-color="#38bdf8"/>
+      <stop offset="100%" stop-color="#00d9c0"/>
+    </linearGradient>
+    <pattern id="grid" width="28" height="28" patternUnits="userSpaceOnUse">
+      <path d="M 28 0 L 0 0 0 28" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1"/>
+    </pattern>
+  </defs>
+
+  <style>
+    .pulse-ring { animation: pulseRing 2.6s ease-out infinite; transform-origin: 120px 110px; }
+    .scan-line { animation: scanMove 4s linear infinite; }
+    .wave { stroke-dasharray: 12 8; animation: dashMove 1.8s linear infinite; }
+    @keyframes pulseRing {
+      0% { r: 42; opacity: 0.8; }
+      100% { r: 70; opacity: 0; }
+    }
+    @keyframes scanMove {
+      0% { transform: translateX(0); opacity: 0; }
+      20% { opacity: 0.4; }
+      80% { opacity: 0.4; }
+      100% { transform: translateX(760px); opacity: 0; }
+    }
+    @keyframes dashMove {
+      to { stroke-dashoffset: -40; }
+    }
+  </style>
+
+  <rect width="1000" height="220" rx="16" fill="url(#bgGrad)"/>
+  <rect width="1000" height="220" rx="16" fill="url(#grid)"/>
+  <rect x="1" y="1" width="998" height="218" rx="15" fill="none" stroke="rgba(0,217,192,0.28)" stroke-width="1.5"/>
+
+  <!-- Subtle scanning beam -->
+  <rect class="scan-line" x="60" y="0" width="90" height="220" fill="rgba(0,217,192,0.05)"/>
+
+  <!-- Animated Shield Emblem -->
+  <circle class="pulse-ring" cx="120" cy="110" r="42" fill="none" stroke="#00d9c0" stroke-width="2"/>
+  <circle cx="120" cy="110" r="44" fill="#0c1424" stroke="#00d9c0" stroke-width="2"/>
+  <path d="M120 82 L144 92 V112 C144 128 133 139 120 144 C107 139 96 128 96 112 V92 Z" fill="rgba(0,217,192,0.14)" stroke="#00d9c0" stroke-width="2.5"/>
+  <path d="M110 112 L117 119 L131 103" fill="none" stroke="#33c777" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <!-- Title & Subtitle -->
+  <text x="195" y="96" fill="#f8fafc" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="38" font-weight="800" letter-spacing="-0.5">Sentinel-AI NIDS</text>
+  <text x="195" y="128" fill="url(#accentGrad)" font-family="Consolas, JetBrains Mono, monospace" font-size="15" font-weight="700" letter-spacing="1.5">AI-DRIVEN NETWORK INTRUSION DETECTION &amp; ACTIVE DEFENSE</text>
+  <text x="195" y="156" fill="#94a3b8" font-family="Segoe UI, Inter, Arial, sans-serif" font-size="14">Suricata EVE Telemetry  •  12-Feature Aligned XGBoost  •  Kali Console  •  Automated Response</text>
+
+  <!-- Animated signal wave at bottom right -->
+  <path class="wave" d="M 650 185 L 720 185 L 735 168 L 750 198 L 765 178 L 780 185 L 950 185" fill="none" stroke="#00d9c0" stroke-width="2" opacity="0.75"/>
+</svg>

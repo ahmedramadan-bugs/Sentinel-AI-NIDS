@@ -1,0 +1,78 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1000 320" width="100%">
+  <defs>
+    <pattern id="dots" width="20" height="20" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.06)"/>
+    </pattern>
+    <marker id="arrCyan" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,1 L7,4 L0,7 Z" fill="#00d9c0"/>
+    </marker>
+    <marker id="arrRed" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,1 L7,4 L0,7 Z" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <style>
+    .pipe { stroke-dasharray: 8 6; animation: flow 1.2s linear infinite; }
+    .pipe-red { stroke-dasharray: 8 6; animation: flow 0.8s linear infinite; }
+    .glow-node { animation: nodePulse 2.4s ease-in-out infinite; }
+    @keyframes flow { to { stroke-dashoffset: -28; } }
+    @keyframes nodePulse {
+      0%, 100% { stroke-opacity: 0.7; }
+      50% { stroke-opacity: 1; }
+    }
+  </style>
+
+  <rect width="1000" height="320" rx="16" fill="#080b11"/>
+  <rect width="1000" height="320" rx="16" fill="url(#dots)"/>
+  <rect x="1" y="1" width="998" height="318" rx="15" fill="none" stroke="#1e293b" stroke-width="1.5"/>
+
+  <text x="28" y="34" fill="#00d9c0" font-family="Consolas, monospace" font-size="13" font-weight="700">LIVE DETECTION PIPELINE (END-TO-END FLOW)</text>
+
+  <!-- Animated Pipes -->
+  <line class="pipe" x1="175" y1="130" x2="225" y2="130" stroke="#00d9c0" stroke-width="2.5" marker-end="url(#arrCyan)"/>
+  <line class="pipe" x1="375" y1="130" x2="425" y2="130" stroke="#00d9c0" stroke-width="2.5" marker-end="url(#arrCyan)"/>
+  <path class="pipe" d="M 575 115 L 625 90" fill="none" stroke="#00d9c0" stroke-width="2.2" marker-end="url(#arrCyan)"/>
+  <path class="pipe" d="M 575 145 L 625 170" fill="none" stroke="#38bdf8" stroke-width="2.2" marker-end="url(#arrCyan)"/>
+  <path class="pipe-red" d="M 785 90 L 830 120" fill="none" stroke="#ef4444" stroke-width="2.4" marker-end="url(#arrRed)"/>
+  <path class="pipe" d="M 785 170 L 830 140" fill="none" stroke="#00d9c0" stroke-width="2.2" marker-end="url(#arrCyan)"/>
+  <line class="pipe" x1="500" y1="180" x2="500" y2="235" stroke="#00d9c0" stroke-width="2" marker-end="url(#arrCyan)"/>
+
+  <!-- Node 1: Traffic / Kali -->
+  <rect x="25" y="85" width="150" height="90" rx="12" fill="#111826" stroke="#ef4444" stroke-width="2"/>
+  <text x="100" y="114" text-anchor="middle" fill="#fca5a5" font-family="Consolas, monospace" font-size="11" font-weight="700">TRAFFIC / KALI</text>
+  <text x="100" y="136" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="13" font-weight="700">Live Packets</text>
+  <text x="100" y="156" text-anchor="middle" fill="#94a3b8" font-family="Consolas, monospace" font-size="10">Nmap • Hydra • DoS</text>
+
+  <!-- Node 2: Suricata Parser -->
+  <rect x="228" y="85" width="147" height="90" rx="12" fill="#111826" stroke="#38bdf8" stroke-width="2"/>
+  <text x="301" y="114" text-anchor="middle" fill="#7dd3fc" font-family="Consolas, monospace" font-size="11" font-weight="700">COLLECTOR</text>
+  <text x="301" y="136" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="13" font-weight="700">Suricata Parser</text>
+  <text x="301" y="156" text-anchor="middle" fill="#94a3b8" font-family="Consolas, monospace" font-size="10">eve.json stream</text>
+
+  <!-- Node 3: Feature Alignment -->
+  <rect class="glow-node" x="428" y="85" width="147" height="90" rx="12" fill="#111826" stroke="#00d9c0" stroke-width="2"/>
+  <text x="501" y="114" text-anchor="middle" fill="#00d9c0" font-family="Consolas, monospace" font-size="11" font-weight="700">ALIGNMENT</text>
+  <text x="501" y="136" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="13" font-weight="700">12-Feature Vector</text>
+  <text x="501" y="156" text-anchor="middle" fill="#94a3b8" font-family="Consolas, monospace" font-size="10">Zero Serving Skew</text>
+
+  <!-- Node 4A: XGBoost AI -->
+  <rect x="628" y="52" width="157" height="68" rx="12" fill="#0f2922" stroke="#33c777" stroke-width="2"/>
+  <text x="706" y="79" text-anchor="middle" fill="#86efac" font-family="Consolas, monospace" font-size="11" font-weight="700">ML ENGINE</text>
+  <text x="706" y="100" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="13" font-weight="700">XGBoost (6 Classes)</text>
+
+  <!-- Node 4B: Deterministic Rules -->
+  <rect x="628" y="140" width="157" height="68" rx="12" fill="#111826" stroke="#38bdf8" stroke-width="2"/>
+  <text x="706" y="167" text-anchor="middle" fill="#7dd3fc" font-family="Consolas, monospace" font-size="11" font-weight="700">FALLBACK ENGINE</text>
+  <text x="706" y="188" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="13" font-weight="700">Deterministic Rules</text>
+
+  <!-- Node 5: Active Response -->
+  <rect x="833" y="85" width="142" height="90" rx="12" fill="#3b0d11" stroke="#ef4444" stroke-width="2"/>
+  <text x="904" y="114" text-anchor="middle" fill="#fca5a5" font-family="Consolas, monospace" font-size="11" font-weight="700">DEFENSE</text>
+  <text x="904" y="136" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="13" font-weight="700">Active Response</text>
+  <text x="904" y="156" text-anchor="middle" fill="#fecaca" font-family="Consolas, monospace" font-size="10">Block • Alert • Log</text>
+
+  <!-- Bottom Node: SQLite + Web UI -->
+  <rect x="330" y="238" width="340" height="58" rx="12" fill="#111826" stroke="#00d9c0" stroke-width="1.8"/>
+  <text x="500" y="263" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="13" font-weight="700">SQLite Event Store  →  Live Web SOC Dashboard</text>
+  <text x="500" y="282" text-anchor="middle" fill="#94a3b8" font-family="Consolas, monospace" font-size="10.5">Dashboard • Alerts • Network Devices • Kali Console • AI Metrics</text>
+</svg>
