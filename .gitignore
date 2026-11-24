@@ -12,7 +12,7 @@ ENV/
 # Temporary / Runtime data (keep runtime/static for offline UI assets)
 **/runtime/*
 !**/runtime/static/
-response_engine/logs/*.log
+**/response_engine/logs/*.log
 .python-runtime/
 python-runtime.zip
 get-pip.py
