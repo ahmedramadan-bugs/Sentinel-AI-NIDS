@@ -1,0 +1,27 @@
+name: CI Tests
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test-linux-and-windows-bundles:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r Linux_Support/requirements.txt pytest
+      - name: Test Linux_Support
+        working-directory: Linux_Support
+        run: pytest tests
+      - name: Test Windows_Support
+        working-directory: Windows_Support
+        run: pytest tests

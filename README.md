@@ -7,7 +7,15 @@
   <img src="https://img.shields.io/badge/ML-XGBoost%20(92.34%25%20Macro%20F1)-00d9c0?style=for-the-badge" alt="XGBoost"/>
   <img src="https://img.shields.io/badge/IDS-Suricata%20EVE-ef4444?style=for-the-badge" alt="Suricata"/>
   <img src="https://img.shields.io/badge/OS-Linux%20%26%20Windows-33c777?style=for-the-badge" alt="OS Support"/>
-  <img src="https://img.shields.io/badge/Tests-12%20Passing-22c55e?style=for-the-badge" alt="Tests Passing"/>
+  <a href="https://github.com/ahmedramadan-bugs/Sentinel-AI-NIDS/actions"><img src="https://img.shields.io/github/actions/workflow/status/ahmedramadan-bugs/Sentinel-AI-NIDS/tests.yml?style=for-the-badge&label=CI%20Tests" alt="CI Tests"/></a>
+</p>
+
+---
+
+## Live SOC Dashboard Preview
+
+<p align="center">
+  <img src="./docs/assets/soc-preview.svg" alt="Live SOC Dashboard Preview" width="100%"/>
 </p>
 
 ---
@@ -21,7 +29,7 @@
 1. **Live Telemetry Collection:** `SuricataParser` tails `runtime/eve.json` in real time.
 2. **Zero Train/Serving Skew:** `collectors/feature_alignment.py` extracts the exact **12 network flow features** used during training.
 3. **Dual-Engine Detection:** **XGBoost** (`nids/ml.py`) classifies traffic across 6 classes (`Normal`, `Suspicious Port`, `Brute Force`, `Denial of Service`, `Web Attack`, `Botnet`) while **Deterministic Rules** (`nids/rules.py`) act as a resilient fallback.
-4. **Active Response & Visibility:** Threats are persisted in SQLite, streamed to the Web SOC Dashboard (`Dashboard`, `Alerts`, `Network Devices`, `Kali Console`, `AI Models`), and enforced via `ResponseEngine`.
+4. **Active Response & Visibility:** Threats are persisted in SQLite, streamed to the Web SOC Dashboard (`Dashboard`, `Alerts`, `Topology`, `Console`, `AI Models`), and enforced via `ResponseEngine`.
 
 ---
 
@@ -31,9 +39,15 @@
   <img src="./docs/assets/ai-training-flow.svg" alt="AI Training Pipeline" width="100%"/>
 </p>
 
-- **Dataset:** CICIDS2017 (`MachineLearningCVE`), streamed in chunks and **deduplicated before splitting** so zero identical flow vectors leak between train (`80%`), validation (`10%`), and test (`10%`).
-- **Preprocessing:** Median imputation (`SimpleImputer`) → `clip(>= 0)` → `log1p` → `StandardScaler` (fitted on training data only).
-- **Verified Test Metrics (`31,118` deduplicated test rows):** `99.07%` Accuracy, `92.34%` Macro F1-Score (`AI/models/xgboost_nids_artifacts/metrics.json`).
+<details>
+<summary><b>Committee Deep-Dive: Why our ML pipeline has 0% Data Leakage &amp; Zero Serving Skew</b></summary>
+
+- **Dataset:** CICIDS2017 (`MachineLearningCVE`), streamed in `100,000`-row chunks.
+- **Deduplication Before Split:** Exact duplicates on the 12 features and cross-class collisions are removed *before* `train_test_split`, guaranteeing zero identical flow vectors appear in both train (`80%`) and test (`10%`).
+- **Leak-Free Preprocessing:** `SimpleImputer(strategy="median")` → `clip(>= 0)` → `log1p` → `StandardScaler` are fitted on the training split only.
+- **Verified Test Metrics (`31,118` clean test rows):** `99.07%` Accuracy, `92.34%` Macro F1-Score (`AI/models/xgboost_nids_artifacts/metrics.json`).
+
+</details>
 
 ---
 
