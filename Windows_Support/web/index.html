@@ -1,0 +1,659 @@
+<!doctype html>
+<html lang="en" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIDS — Network Intrusion Detection & Active Defense</title>
+
+<!-- Local Offline Assets -->
+<link rel="stylesheet" href="/static/bootstrap.min.css">
+<link rel="stylesheet" href="/static/bootstrap-icons.min.css">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<script src="/static/chart.umd.min.js"></script>
+
+<link rel="stylesheet" href="/css/styles.css">
+</head>
+<body>
+
+<div id="app-shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-brand">
+      <div class="glyph"><i class="bi bi-shield-lock-fill"></i></div>
+      <div>
+        <div class="name">NIDS.CONSOLE</div>
+        <div class="tag">AI-DRIVEN SOC PIPELINE</div>
+      </div>
+    </div>
+    <canvas id="pulseCanvas" class="pulse-strip"></canvas>
+    <ul class="nav flex-column nav-nids" id="nav-links">
+      <li class="nav-item"><a class="nav-link active" data-page="dashboard" href="#"><i class="bi bi-speedometer2"></i> Dashboard</a></li>
+      <li class="nav-item"><a class="nav-link" data-page="alerts" href="#"><i class="bi bi-bell-fill"></i> Alerts</a></li>
+      <li class="nav-item"><a class="nav-link" data-page="topology" href="#"><i class="bi bi-diagram-3-fill"></i> Topology</a></li>
+      <li class="nav-item"><a class="nav-link" data-page="console" href="#"><i class="bi bi-terminal-fill"></i> Console</a></li>
+      <li class="nav-item"><a class="nav-link" data-page="analytics" href="#"><i class="bi bi-bar-chart-line-fill"></i> Analytics</a></li>
+      <li class="nav-item"><a class="nav-link" data-page="ai-models" href="#"><i class="bi bi-cpu-fill"></i> AI Models</a></li>
+      <li class="nav-item"><a class="nav-link" data-page="response" href="#"><i class="bi bi-hdd-network-fill"></i> Response / Firewall</a></li>
+      <li class="nav-item"><a class="nav-link" data-page="settings" href="#"><i class="bi bi-gear-fill"></i> Settings</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <div style="font-size:.72rem; color:var(--text-faint); margin-bottom:4px;">Engine Target</div>
+      <div class="mono" style="font-size:.78rem; color:var(--accent);" id="sidebar-cisco-info">Host Firewall (Local)</div>
+    </div>
+  </aside>
+
+  <div class="main-area">
+    <div class="health-bar">
+      <div class="mobile-toggle" id="mobile-toggle"><i class="bi bi-list"></i></div>
+      <span class="mode-badge" id="system-mode-badge">● LIVE NIDS</span>
+      <div class="health-item"><span class="dot" id="dot-sniffer"></span> Traffic Sniffer: <b id="lbl-sniffer">ACTIVE</b></div>
+      <div class="health-item"><span class="dot" id="dot-ai"></span> AI Engine: <b id="lbl-ai">ONLINE (XGBoost)</b></div>
+      <div class="health-item"><span class="dot" id="dot-fw"></span> Firewall (Switch): <b id="lbl-fw">CONNECTED</b></div>
+      <div class="health-spacer" id="clock"></div>
+    </div>
+
+    <div class="page-wrap">
+
+      <!-- ===== DASHBOARD PAGE ===== -->
+      <section id="page-dashboard">
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">Dashboard</h1>
+            <div class="page-desc">Live overview of network security posture and correlated detections</div>
+          </div>
+          <button class="demo-btn" id="btn-refresh-now"><i class="bi bi-arrow-clockwise"></i> Refresh Now</button>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-6 col-lg-3">
+            <div class="kpi k-active"><div class="bar"></div><div class="lbl">Active Alerts</div><div class="val" id="kpi-active">—</div></div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="kpi k-critical"><div class="bar"></div><div class="lbl">Critical Threats</div><div class="val" id="kpi-critical">—</div></div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="kpi k-resolved"><div class="bar"></div><div class="lbl">Blocks / Mitigated</div><div class="val" id="kpi-resolved">—</div></div>
+          </div>
+          <div class="col-6 col-lg-3">
+            <div class="kpi k-flows"><div class="bar"></div><div class="lbl">Total Flows Analyzed</div><div class="val" id="kpi-flows">—</div></div>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-lg-8">
+            <div class="card-nids h-100">
+              <div class="card-title-nids">
+                <span>Traffic Volume (Live Packets/Flows)</span>
+                <select id="traffic-range" class="form-select form-select-sm" style="width:auto; background:var(--bg-alt); color:var(--text); border-color:var(--border); font-family:var(--mono); font-size:.75rem;">
+                  <option value="24h" selected>Last 24 hours</option>
+                  <option value="6h">Last 6 hours</option>
+                  <option value="1h">Last 1 hour</option>
+                </select>
+              </div>
+              <canvas id="trafficChart" height="90"></canvas>
+            </div>
+          </div>
+          <div class="col-lg-4">
+            <div class="card-nids h-100">
+              <div class="card-title-nids"><span>Attack Distribution</span></div>
+              <canvas id="attackPie" height="200"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-nids">
+          <div class="card-title-nids"><span>Latest Security Events</span><a href="#" data-page="alerts" class="nav-link p-0" style="width:auto;color:var(--accent);font-size:.75rem;">View all alerts →</a></div>
+          <div style="overflow-x:auto;">
+            <table class="table-nids" id="latest-alerts-table">
+              <thead><tr><th>Source IP</th><th>Destination</th><th>Attack Type</th><th>Severity</th><th>Confidence</th><th>Status</th><th>Time</th><th>Action</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== ALERTS LIST PAGE ===== -->
+      <section id="page-alerts" style="display:none;">
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">Alerts & Incidents</h1>
+            <div class="page-desc">All detected events across the monitored network</div>
+          </div>
+          <button class="btn-ghost" id="export-csv"><i class="bi bi-download me-1"></i> Export CSV</button>
+        </div>
+
+        <div class="filter-bar">
+          <div class="filter-field">
+            <label>Severity</label>
+            <select id="f-severity"><option value="">All</option><option value="Critical">Critical</option><option value="High">High</option><option value="Medium">Medium</option><option value="Low">Low</option><option value="Info">Info</option></select>
+          </div>
+          <div class="filter-field">
+            <label>Attack Type</label>
+            <select id="f-type"><option value="">All</option></select>
+          </div>
+          <div class="filter-field">
+            <label>From Date</label>
+            <input type="date" id="f-from">
+          </div>
+          <div class="filter-field">
+            <label>To Date</label>
+            <input type="date" id="f-to">
+          </div>
+          <div class="filter-field">
+            <label>IP Filter</label>
+            <input type="text" id="f-ip" placeholder="e.g. 192.168.10.10">
+          </div>
+          <div class="filter-field" style="min-width:200px;">
+            <label><i class="bi bi-search"></i> Search</label>
+            <input type="text" id="f-search" placeholder="Search IP, rule, attack...">
+          </div>
+          <div class="filter-field">
+            <label>&nbsp;</label>
+            <button class="btn-ghost" id="f-clear">Clear</button>
+          </div>
+        </div>
+
+        <div class="card-nids">
+          <div style="overflow-x:auto;">
+            <table class="table-nids" id="alerts-table">
+              <thead><tr><th>Source IP</th><th>Destination</th><th>Attack Type</th><th>Severity</th><th>Engine / Mode</th><th>Confidence</th><th>Response</th><th>Time</th></tr></thead>
+              <tbody></tbody>
+            </table>
+          </div>
+          <div class="empty-state text-center p-4" id="alerts-empty" style="display:none; color:var(--text-faint);">No security events match the current filter.</div>
+        </div>
+      </section>
+
+      <!-- ===== ALERT DETAIL PAGE ===== -->
+      <section id="page-alert-detail" style="display:none;">
+        <div class="back-link" data-page="alerts"><i class="bi bi-arrow-left"></i> Back to Alerts</div>
+        <div class="page-head">
+          <div>
+            <h1 class="page-title mono" id="detail-title">Alert Details</h1>
+            <div class="page-desc" id="detail-sub">—</div>
+          </div>
+        </div>
+
+        <div class="risk-box mb-3" id="risk-box">
+          <div class="risk-ring" id="risk-ring">
+            <svg viewBox="0 0 36 36"><path d="M18 2.5 a15.5 15.5 0 0 1 0 31 a15.5 15.5 0 0 1 0 -31" fill="none" stroke="rgba(255,255,255,.08)" stroke-width="3"></path><path id="risk-arc" d="M18 2.5 a15.5 15.5 0 0 1 0 31 a15.5 15.5 0 0 1 0 -31" fill="none" stroke="var(--critical)" stroke-width="3" stroke-dasharray="0,100" stroke-linecap="round"></path></svg>
+            <div class="num" id="risk-num">0%</div>
+          </div>
+          <div class="risk-meta">
+            <div class="rm"><span class="k">ML Confidence</span><span class="v" id="risk-conf">—</span></div>
+            <div class="rm"><span class="k">Attack Classification</span><span class="v" id="risk-type">—</span></div>
+            <div class="rm"><span class="k">Detection Engine</span><span class="v" id="risk-engine">—</span></div>
+            <div class="rm"><span class="k">Enforcement Action</span><span class="v" id="risk-action">—</span></div>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-lg-6">
+            <div class="card-nids h-100">
+              <div class="card-title-nids"><span>Raw Flow & Protocol Attributes</span></div>
+              <table class="kv-table">
+                <tr><td>Source IP</td><td id="raw-src">—</td></tr>
+                <tr><td>Destination IP</td><td id="raw-dst">—</td></tr>
+                <tr><td>Port</td><td id="raw-port">—</td></tr>
+                <tr><td>Protocol</td><td id="raw-proto">—</td></tr>
+                <tr><td>Suricata Signature</td><td id="raw-sig">—</td></tr>
+                <tr><td>Rule ID</td><td id="raw-rule">—</td></tr>
+                <tr><td>Correlation Key</td><td id="raw-key" style="font-size:.7rem; word-break:break-all;">—</td></tr>
+              </table>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card-nids h-100">
+              <div class="card-title-nids"><span>AI Model Inference & Decision</span></div>
+              <div id="model-bars"></div>
+              <div class="mt-3 p-2 rounded" style="background:var(--bg-alt); font-size:.78rem; border:1px solid var(--border-soft);" id="raw-details-text"></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-nids">
+          <div class="card-title-nids"><span>Active Response & Mitigation</span></div>
+          <div class="d-flex gap-2 align-items-center flex-wrap">
+            <select id="detail-block-duration" class="form-select form-select-sm" style="width:auto; background:var(--bg-alt); color:var(--text); border-color:var(--border); font-family:var(--mono); font-size:.82rem;">
+              <option value="60">1 Min (60s)</option>
+              <option value="300" selected>5 Mins (300s)</option>
+              <option value="900">15 Mins (900s)</option>
+              <option value="3600">1 Hour (3600s)</option>
+              <option value="0">Permanent</option>
+            </select>
+            <button class="btn btn-nids" id="btn-block-detail" style="background:var(--critical); color:#fff;"><i class="bi bi-slash-circle me-1"></i> Block Source IP on Switch</button>
+            <button class="btn btn-ghost" id="btn-unblock-detail"><i class="bi bi-check-circle me-1"></i> Unblock IP</button>
+            <button class="btn btn-ghost" id="btn-white-detail"><i class="bi bi-shield-plus me-1"></i> Whitelist Source IP</button>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== ANALYTICS PAGE ===== -->
+      <section id="page-analytics" style="display:none;">
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">Traffic Analytics & Insights</h1>
+            <div class="page-desc">Aggregated patterns from the SQLite security event store</div>
+          </div>
+        </div>
+
+        <ul class="nav nav-tabs-nids mb-3" id="analytics-tabs">
+          <li class="nav-item"><a class="nav-link active" data-tab="heatmap" href="#">Heatmap Matrix</a></li>
+          <li class="nav-item"><a class="nav-link" data-tab="attackers" href="#">Top Attacker IPs</a></li>
+          <li class="nav-item"><a class="nav-link" data-tab="protocol" href="#">Protocol Distribution</a></li>
+        </ul>
+
+        <div id="tab-heatmap">
+          <div class="card-nids">
+            <div class="card-title-nids"><span>Attack Frequency — Hour of Day × Day of Week</span></div>
+            <div class="heat-grid" id="heatmap"></div>
+          </div>
+        </div>
+
+        <div id="tab-attackers" style="display:none;">
+          <div class="card-nids">
+            <div class="card-title-nids"><span>Top Target / Attacker IP Addresses</span></div>
+            <div style="overflow-x:auto;">
+              <table class="table-nids" id="top-attackers-table">
+                <thead><tr><th>#</th><th>IP Address</th><th>Security Events</th><th>Attack Category</th><th>Last Observed</th></tr></thead>
+                <tbody></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+
+        <div id="tab-protocol" style="display:none;">
+          <div class="row g-3">
+            <div class="col-lg-6">
+              <div class="card-nids"><div class="card-title-nids"><span>Network Protocol Breakdown</span></div><canvas id="protocolPie" height="200"></canvas></div>
+            </div>
+            <div class="col-lg-6">
+              <div class="card-nids">
+                <div class="card-title-nids"><span>Protocol Summary</span></div>
+                <div id="protocol-breakdown" style="font-size:.85rem; font-family:var(--mono);"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== AI MODELS PAGE ===== -->
+      <section id="page-ai-models" style="display:none;">
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">AI & Machine Learning Engine</h1>
+            <div class="page-desc">Real empirical evaluation metrics and feature schema for trained XGBoost model</div>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-lg-6">
+            <div class="card-nids h-100">
+              <div class="card-title-nids"><span><i class="bi bi-diagram-3-fill me-1"></i>XGBoost Classifier (Active Production Model)</span></div>
+              <div class="row text-center g-2 mb-3">
+                <div class="col-3"><div class="mono" style="font-size:1.3rem;font-weight:800;" id="m-acc">99.96%</div><div style="font-size:.65rem;color:var(--text-faint);text-transform:uppercase;">Accuracy</div></div>
+                <div class="col-3"><div class="mono" style="font-size:1.3rem;font-weight:800;" id="m-prec">99.96%</div><div style="font-size:.65rem;color:var(--text-faint);text-transform:uppercase;">Precision</div></div>
+                <div class="col-3"><div class="mono" style="font-size:1.3rem;font-weight:800;" id="m-rec">99.95%</div><div style="font-size:.65rem;color:var(--text-faint);text-transform:uppercase;">Recall</div></div>
+                <div class="col-3"><div class="mono" style="font-size:1.3rem;font-weight:800;" id="m-f1">0.9995</div><div style="font-size:.65rem;color:var(--text-faint);text-transform:uppercase;">Macro F1</div></div>
+              </div>
+              <div class="section-title" style="font-size:.78rem;"><i class="bi bi-grid-3x3"></i> Empirical Test Set Confusion Matrix</div>
+              <div id="confusion-matrix-box"></div>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="card-nids h-100">
+              <div class="card-title-nids"><span>Global Feature Importance (XGBoost Gini Gains)</span></div>
+              <canvas id="importanceChart" height="220"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-nids mb-3">
+          <div class="card-title-nids"><span>Live 12-Feature Alignment Schema</span></div>
+          <div id="feature-schema-list" class="row g-2" style="font-size:.8rem; font-family:var(--mono);"></div>
+        </div>
+      </section>
+
+      <!-- ===== RESPONSE / FIREWALL PAGE ===== -->
+      <section id="page-response" style="display:none;">
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">Active Response & Defense</h1>
+            <div class="page-desc">Automated and manual threat mitigation with active enforcement tracking</div>
+          </div>
+        </div>
+
+        <div class="counter-strip">
+          <div class="counter-pill"><div class="n" id="c-total">0</div><div class="l">Active Blocks</div></div>
+          <div class="counter-pill"><div class="n" id="c-temp">0</div><div class="l">Temporary Blocks</div></div>
+          <div class="counter-pill"><div class="n" id="c-perm">0</div><div class="l">Permanent Blocks</div></div>
+          <div class="counter-pill"><div class="n" id="c-white">0</div><div class="l">Whitelisted IPs</div></div>
+        </div>
+
+        <!-- Custom Manual Block & Whitelist Management Row -->
+        <div class="row g-3 mb-3">
+          <div class="col-lg-7">
+            <div class="card-nids h-100">
+              <div class="card-title-nids"><span><i class="bi bi-shield-slash-fill me-1"></i>Manual IP Block / Enforcement</span></div>
+              <div class="row g-2 mb-2">
+                <div class="col-md-7">
+                  <label class="form-label mb-1" style="font-size:.68rem; color:var(--text-faint); text-transform:uppercase; font-weight:600;">Target IP Address</label>
+                  <input type="text" id="manual-block-ip" class="form-control" style="background:var(--bg-alt); border-color:var(--border); color:var(--text); font-family:var(--mono); font-size:.82rem;" placeholder="192.168.10.x">
+                </div>
+                <div class="col-md-5">
+                  <label class="form-label mb-1" style="font-size:.68rem; color:var(--text-faint); text-transform:uppercase; font-weight:600;">Block Duration</label>
+                  <select id="manual-block-duration" class="form-select" style="background:var(--bg-alt); border-color:var(--border); color:var(--text); font-family:var(--mono); font-size:.82rem;">
+                    <option value="60">1 Minute</option>
+                    <option value="300" selected>5 Minutes</option>
+                    <option value="900">15 Minutes</option>
+                    <option value="3600">1 Hour</option>
+                    <option value="0">Permanent</option>
+                  </select>
+                </div>
+              </div>
+              <div class="mb-3">
+                <label class="form-label mb-1" style="font-size:.68rem; color:var(--text-faint); text-transform:uppercase; font-weight:600;">Attack / Reason</label>
+                <input type="text" id="manual-block-reason" class="form-control" style="background:var(--bg-alt); border-color:var(--border); color:var(--text); font-family:var(--mono); font-size:.82rem;" placeholder="Manual Admin Block" value="Manual Admin Block">
+              </div>
+              <button class="btn btn-nids" id="btn-manual-block" style="background:var(--critical); border-color:var(--critical); color:#fff;"><i class="bi bi-slash-circle me-1"></i> Block IP Address</button>
+            </div>
+          </div>
+          <div class="col-lg-5">
+            <div class="card-nids h-100">
+              <div class="card-title-nids"><span>Protected Whitelist</span></div>
+              <div class="d-flex gap-2 mb-3">
+                <input type="text" id="whitelist-input" class="form-control" style="background:var(--bg-alt); border-color:var(--border); color:var(--text); font-family:var(--mono); font-size:.82rem;" placeholder="192.168.10.x">
+                <button class="btn btn-nids" id="whitelist-add" style="white-space:nowrap;">Add IP</button>
+              </div>
+              <div style="max-height:220px; overflow-y:auto;">
+                <table class="table-nids"><thead><tr><th>IP Address</th><th>Action</th></tr></thead><tbody id="whitelist-body"></tbody></table>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-12">
+            <div class="card-nids h-100">
+              <div class="card-title-nids"><span>Active Blocklist</span></div>
+              <div style="overflow-x:auto;">
+                <table class="table-nids"><thead><tr><th>IP Address</th><th>Type</th><th>Reason / Attack</th><th>Time Remaining</th><th>Action</th></tr></thead><tbody id="blocked-body"></tbody></table>
+              </div>
+              <div class="empty-state text-center p-3" id="blocked-empty" style="display:none; color:var(--text-faint);">No active blocks.</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-nids">
+          <div class="card-title-nids"><span>SSH Command & Enforcement Audit Trail</span></div>
+          <div style="overflow-x:auto;">
+            <table class="table-nids"><thead><tr><th>Action</th><th>Target IP</th><th>Attack / Reason</th><th>Result</th><th>Timestamp</th></tr></thead><tbody id="ssh-body"></tbody></table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== SETTINGS & INTEGRATION PAGE ===== -->
+      <section id="page-settings" style="display:none;">
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">Settings & Integration</h1>
+            <div class="page-desc">Configure enforcement architecture (Zero-Hardware vs Cisco) and custom response policies</div>
+          </div>
+          <button class="btn btn-nids" id="btn-save-settings"><i class="bi bi-check2-circle me-1"></i> Save All Settings</button>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <!-- Card 1: Enforcement Target Mode -->
+          <div class="col-lg-6">
+            <div class="card-nids h-100">
+              <div class="card-title-nids">
+                <span><i class="bi bi-shield-shaded me-1"></i> Firewall Enforcement Mode</span>
+              </div>
+              <div class="p-2">
+                <div class="form-check mb-3">
+                  <input class="form-check-input" type="radio" name="enforceMode" id="mode-host" value="host">
+                  <label class="form-check-label" for="mode-host">
+                    <b style="color:var(--accent);">Zero-Hardware Mode (Host Firewall)</b>
+                    <div style="font-size:.78rem; color:var(--text-dim);">Protects this machine directly using local Linux <code>iptables</code> or Windows Defender Firewall. Zero external network devices required.</div>
+                  </label>
+                </div>
+                <div class="form-check mb-3">
+                  <input class="form-check-input" type="radio" name="enforceMode" id="mode-cisco" value="cisco">
+                  <label class="form-check-label" for="mode-cisco">
+                    <b style="color:var(--accent);">Cisco Switch Mode (Enterprise)</b>
+                    <div style="font-size:.78rem; color:var(--text-dim);">Connects to a physical or GNS3 Cisco IOS switch via SSH and dynamically updates <code>IDS-BLOCK</code> ACLs.</div>
+                  </label>
+                </div>
+                <div class="form-check mb-3">
+                  <input class="form-check-input" type="radio" name="enforceMode" id="mode-dry" value="dry_run">
+                  <label class="form-check-label" for="mode-dry">
+                    <b style="color:var(--text);">Simulation / Dry-Run Mode</b>
+                    <div style="font-size:.78rem; color:var(--text-dim);">Detects threats, logs incidents, and displays on SOC dashboard without altering real network states.</div>
+                  </label>
+                </div>
+
+                <div id="cisco-config-panel" class="mt-3 p-3" style="background:var(--bg-alt); border:1px solid var(--border); border-radius:6px; display:none;">
+                  <div style="font-size:.78rem; font-weight:600; color:var(--text-faint); margin-bottom:8px;">CISCO SWITCH CREDENTIALS</div>
+                  <div class="row g-2">
+                    <div class="col-6">
+                      <label style="font-size:.72rem;">Switch IP</label>
+                      <input type="text" id="cfg-cisco-host" class="form-control form-control-sm" style="background:var(--bg); color:var(--text); border-color:var(--border);" placeholder="192.168.10.2">
+                    </div>
+                    <div class="col-6">
+                      <label style="font-size:.72rem;">Username</label>
+                      <input type="text" id="cfg-cisco-user" class="form-control form-control-sm" style="background:var(--bg); color:var(--text); border-color:var(--border);" placeholder="admin">
+                    </div>
+                  </div>
+                  <button class="btn-ghost mt-2 w-100" id="btn-test-cisco"><i class="bi bi-hdd-network me-1"></i> Test Switch SSH Connection</button>
+                  <div id="cisco-test-result" class="mt-2" style="font-size:.75rem;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Card 2: Custom Alert Actions Matrix -->
+          <div class="col-lg-6">
+            <div class="card-nids h-100">
+              <div class="card-title-nids">
+                <span><i class="bi bi-sliders me-1"></i> Automated Response Policy</span>
+              </div>
+              <div class="p-2">
+                <div style="font-size:.78rem; color:var(--text-dim); margin-bottom:14px;">
+                  Define automated enforcement behavior based on threat severity level:
+                </div>
+
+                <div class="mb-3 row align-items-center">
+                  <div class="col-5" style="font-size:.82rem;"><span class="badge-sev badge-critical">Critical</span> Threats:</div>
+                  <div class="col-7">
+                    <select id="pol-critical" class="form-select form-select-sm" style="background:var(--bg-alt); color:var(--text); border-color:var(--border);">
+                      <option value="BLOCK" selected>Permanent Block</option>
+                      <option value="TEMPORARY_BLOCK">Temporary Block</option>
+                      <option value="ALERT">Alert Only</option>
+                      <option value="LOG">Log Only</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="mb-3 row align-items-center">
+                  <div class="col-5" style="font-size:.82rem;"><span class="badge-sev badge-high">High</span> Threats:</div>
+                  <div class="col-7">
+                    <select id="pol-high" class="form-select form-select-sm" style="background:var(--bg-alt); color:var(--text); border-color:var(--border);">
+                      <option value="TEMPORARY_BLOCK" selected>Temporary Block</option>
+                      <option value="BLOCK">Permanent Block</option>
+                      <option value="ALERT">Alert Only</option>
+                      <option value="LOG">Log Only</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="mb-3 row align-items-center">
+                  <div class="col-5" style="font-size:.82rem;"><span class="badge-sev badge-medium">Medium</span> Threats:</div>
+                  <div class="col-7">
+                    <select id="pol-medium" class="form-select form-select-sm" style="background:var(--bg-alt); color:var(--text); border-color:var(--border);">
+                      <option value="ALERT" selected>Alert Only</option>
+                      <option value="TEMPORARY_BLOCK">Temporary Block</option>
+                      <option value="BLOCK">Permanent Block</option>
+                      <option value="LOG">Log Only</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="mb-3 row align-items-center">
+                  <div class="col-5" style="font-size:.82rem;"><span class="badge-sev badge-low">Low / Info</span> Events:</div>
+                  <div class="col-7">
+                    <select id="pol-low" class="form-select form-select-sm" style="background:var(--bg-alt); color:var(--text); border-color:var(--border);">
+                      <option value="LOG" selected>Log Only</option>
+                      <option value="ALERT">Alert Only</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="row align-items-center pt-2" style="border-top:1px solid var(--border);">
+                  <div class="col-5" style="font-size:.82rem;">Temporary Block Duration:</div>
+                  <div class="col-7">
+                    <div class="input-group input-group-sm">
+                      <input type="number" id="pol-timeout" class="form-control" style="background:var(--bg-alt); color:var(--text); border-color:var(--border); font-family:var(--mono);" value="300" min="10" max="86400">
+                      <span class="input-group-text" style="background:var(--bg-alt); color:var(--text-dim); border-color:var(--border);">seconds</span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== TOPOLOGY PAGE ===== -->
+      <section id="page-topology" style="display:none">
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">Network Devices</h1>
+            <div class="page-desc">Live overview of Online, Offline, Attacking, and Blocked devices on the network</div>
+          </div>
+          <div class="d-flex align-items-center gap-2 flex-wrap">
+            <div class="btn-group btn-group-sm" role="group" aria-label="Filter devices by status">
+              <button type="button" class="btn btn-info" data-topo-filter="all" onclick="setTopoFilter('all')">All</button>
+              <button type="button" class="btn btn-outline-secondary" data-topo-filter="online" onclick="setTopoFilter('online')">Online</button>
+              <button type="button" class="btn btn-outline-secondary" data-topo-filter="offline" onclick="setTopoFilter('offline')">Offline</button>
+              <button type="button" class="btn btn-outline-secondary" data-topo-filter="attacking" onclick="setTopoFilter('attacking')">Attacking / Blocked</button>
+            </div>
+            <button type="button" class="btn btn-sm btn-outline-info" onclick="renderTopology()"><i class="bi bi-arrow-clockwise me-1"></i>Refresh</button>
+          </div>
+        </div>
+
+        <div class="topo-stats-grid" id="topologyStats"></div>
+
+        <div class="card-nids">
+          <div class="card-head">
+            <span><i class="bi bi-hdd-network-fill me-2" style="color:var(--accent);"></i>Discovered Network Devices</span>
+            <span class="mono" style="font-size:.74rem; color:var(--text-dim);">Auto-refreshes every 2.5s</span>
+          </div>
+          <div class="card-body p-0">
+            <div class="table-responsive">
+              <table class="table table-nids mb-0">
+                <thead>
+                  <tr><th>IP Address</th><th>Zone</th><th>Status</th><th>Alerts</th><th>Last Attack</th><th>Last Seen</th><th class="text-end">Action</th></tr>
+                </thead>
+                <tbody id="topologyTableBody">
+                  <tr><td colspan="7" class="text-center py-4" style="color:var(--text-dim);">Loading devices...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- ===== KALI CONSOLE PAGE ===== -->
+      <section id="page-console" style="display:none">
+        <div class="page-head">
+          <div>
+            <h1 class="page-title">Kali Attack Console</h1>
+            <div class="page-desc">Connect to Kali Linux (SSH or Demo Simulator) and trigger live attacks to verify NIDS detection</div>
+          </div>
+          <span class="badge-status failed" id="kaliConnBadge">DISCONNECTED</span>
+        </div>
+
+        <div class="row g-3 mb-3">
+          <div class="col-lg-5">
+            <div class="card-nids h-100">
+              <div class="card-head"><span><i class="bi bi-plug-fill me-2" style="color:var(--accent);"></i>Kali Connection</span></div>
+              <div class="card-body">
+                <form id="kaliConnectForm" class="row g-2">
+                  <div class="col-8">
+                    <label class="form-label" style="font-size:.76rem; color:var(--text-dim);">Kali Host IP</label>
+                    <input type="text" id="kaliHost" class="form-control form-control-sm mono" style="background:var(--bg-alt); color:var(--text); border-color:var(--border);" value="192.168.56.101" required>
+                  </div>
+                  <div class="col-4">
+                    <label class="form-label" style="font-size:.76rem; color:var(--text-dim);">SSH Port</label>
+                    <input type="number" id="kaliPort" class="form-control form-control-sm mono" style="background:var(--bg-alt); color:var(--text); border-color:var(--border);" value="22">
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label" style="font-size:.76rem; color:var(--text-dim);">Username</label>
+                    <input type="text" id="kaliUser" class="form-control form-control-sm mono" style="background:var(--bg-alt); color:var(--text); border-color:var(--border);" value="kali" required>
+                  </div>
+                  <div class="col-6">
+                    <label class="form-label" style="font-size:.76rem; color:var(--text-dim);">Password</label>
+                    <input type="password" id="kaliPassword" class="form-control form-control-sm" style="background:var(--bg-alt); color:var(--text); border-color:var(--border);" placeholder="••••••">
+                  </div>
+                  <div class="col-12">
+                    <label class="form-label" style="font-size:.76rem; color:var(--text-dim);">Mode</label>
+                    <select id="kaliMode" class="form-select form-select-sm" style="background:var(--bg-alt); color:var(--text); border-color:var(--border);">
+                      <option value="simulation" selected>Demo Simulator (Safe Committee Demo)</option>
+                      <option value="ssh">Live SSH (Real Kali VM)</option>
+                    </select>
+                  </div>
+                  <div class="col-12 d-flex gap-2 mt-2">
+                    <button type="submit" class="btn btn-sm btn-info flex-fill fw-semibold"><i class="bi bi-link-45deg me-1"></i>Connect</button>
+                    <button type="button" id="kaliDisconnectBtn" class="btn btn-sm btn-outline-secondary">Disconnect</button>
+                  </div>
+                </form>
+              </div>
+            </div>
+          </div>
+
+          <div class="col-lg-7">
+            <div class="card-nids h-100">
+              <div class="card-head">
+                <span><i class="bi bi-lightning-charge-fill me-2" style="color:var(--high);"></i>Quick Attack Playbooks</span>
+                <div class="d-flex align-items-center gap-2">
+                  <span style="font-size:.74rem; color:var(--text-dim);">Target IP:</span>
+                  <input type="text" id="kaliTargetIp" class="form-control form-control-sm mono" style="width:140px; background:var(--bg-alt); color:var(--text); border-color:var(--border);" value="192.168.56.10">
+                </div>
+              </div>
+              <div class="card-body">
+                <div id="kaliPlaybooksGrid" class="playbook-grid"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-nids">
+          <div class="card-head">
+            <span><i class="bi bi-terminal me-2" style="color:var(--accent);"></i>Console Output</span>
+            <button type="button" id="kaliClearBtn" class="btn btn-sm btn-outline-secondary py-0 px-2">Clear</button>
+          </div>
+          <div class="card-body">
+            <div id="kaliTerminalOutput" class="kali-terminal" aria-live="polite">
+              <div class="meta-line">Sentinel-AI Kali Console ready. Click "Connect" then run a playbook or custom command.</div>
+            </div>
+            <form id="kaliExecForm" class="input-group input-group-sm mt-2">
+              <span class="input-group-text mono" style="background:var(--bg-alt); color:var(--accent); border-color:var(--border);">$</span>
+              <input type="text" id="kaliCmdInput" class="form-control mono" style="background:var(--bg-alt); color:var(--text); border-color:var(--border);" placeholder="Enter Kali command (e.g. nmap -sS 192.168.56.10)">
+              <button type="submit" class="btn btn-info fw-semibold">Run Command</button>
+            </form>
+          </div>
+        </div>
+      </section>
+
+    </div>
+  </div>
+</div>
+
+<div class="toast-container-nids" id="toastContainer" style="position:fixed; bottom:20px; right:20px; z-index:2000; display:flex; flex-direction:column; gap:8px; align-items:flex-end;"></div>
+
+<script src="/js/topology.js"></script>
+<script src="/js/console.js"></script>
+<script src="/js/script.js"></script>
+</body>
+</html>

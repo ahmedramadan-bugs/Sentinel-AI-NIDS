@@ -1,0 +1,9 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=NIDS Security System
+Comment=Start NIDS Live Detection Dashboard & AI Engine
+Exec=/home/ahmed/p2/start_nids.sh
+Icon=security-high
+Terminal=true
+Categories=Security;Network;

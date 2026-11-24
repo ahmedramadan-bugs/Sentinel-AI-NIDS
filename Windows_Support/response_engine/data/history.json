@@ -1,0 +1,38 @@
+[
+    {
+        "id": "e8aaa83e-870f-4e46-b09d-4db0d32fe93b",
+        "action": "block",
+        "ip": "10.0.0.99",
+        "attack": "Port Scan",
+        "severity": "Critical",
+        "source": "NIDS",
+        "timeout": null,
+        "success": true,
+        "verified": true,
+        "timestamp": "2026-10-19T16:24:21.120019"
+    },
+    {
+        "id": "3bbc74b3-4022-4f80-9257-97d4fdf2b6f8",
+        "action": "block",
+        "ip": "10.0.0.88",
+        "attack": "Brute Force",
+        "severity": "High",
+        "source": "NIDS",
+        "timeout": 300,
+        "success": true,
+        "verified": true,
+        "timestamp": "2026-10-19T16:24:21.121221"
+    },
+    {
+        "id": "489c6a83-c590-4fc9-90fe-791dad9ab89a",
+        "action": "block",
+        "ip": "10.1.2.3",
+        "attack": "Test",
+        "severity": "Critical",
+        "source": "Test",
+        "timeout": null,
+        "success": true,
+        "verified": true,
+        "timestamp": "2026-10-19T16:26:13.079135"
+    }
+]

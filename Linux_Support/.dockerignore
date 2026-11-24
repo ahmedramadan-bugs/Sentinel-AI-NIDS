@@ -1,0 +1,16 @@
+.git
+.gitignore
+.venv
+venv
+ENV
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.pytest_cache
+AI/MachineLearningCSV
+AI/processed_data
+AI/models/ensemble_nids_model.pkl
+*.zip
+*.tar.gz
+Sentinel_AI_NIDS_Portable_Demo.zip

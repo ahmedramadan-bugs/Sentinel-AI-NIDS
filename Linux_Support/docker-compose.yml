@@ -1,0 +1,28 @@
+services:
+  sentinel-nids:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: sentinel-ai-nids
+    restart: unless-stopped
+    # Use host network mode on Linux for direct packet/port inspection and host iptables
+    # network_mode: "host"
+    ports:
+      - "8080:8080"
+    environment:
+      - NIDS_DASHBOARD_HOST=0.0.0.0
+      - NIDS_DASHBOARD_PORT=8080
+      - NIDS_RESPONSE_DRY_RUN=true
+      - NIDS_TEMP_BLOCK_SECONDS=300
+      - NIDS_ML_CONFIDENCE_THRESHOLD=0.70
+      # Optional: To connect to physical/GNS3 Cisco switch, provide switch IP & credentials:
+      # - NIDS_CISCO_HOST=192.168.10.2
+      # - NIDS_CISCO_USERNAME=ahmed
+      # - NIDS_CISCO_PASSWORD=Ahmed123
+    volumes:
+      # Persist SQLite database, policy settings, and logs across container restarts
+      - ./runtime:/app/runtime
+      # Optional: Mount host's Suricata EVE JSON log if Suricata runs on the host
+      - /var/log/suricata:/var/log/suricata:ro
+    cap_add:
+      - NET_ADMIN  # Needed if using Zero-Hardware host iptables inside container
