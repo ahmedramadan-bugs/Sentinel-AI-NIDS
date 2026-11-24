@@ -12,39 +12,26 @@
 
 ---
 
-## Live SOC Dashboard Preview
+## How Sentinel-AI NIDS Works
+
+<p align="center">
+  <img src="./docs/assets/sentinel-overview.svg" alt="Sentinel-AI NIDS Architecture Overview" width="100%"/>
+</p>
+
+---
+
+## Live SOC Dashboard (`NIDS.CONSOLE`)
 
 <p align="center">
   <img src="./docs/assets/soc-preview.svg" alt="Live SOC Dashboard Preview" width="100%"/>
 </p>
 
----
-
-## How Sentinel-AI NIDS Works
-
-<p align="center">
-  <img src="./docs/assets/pipeline-flow.svg" alt="Live Detection Pipeline" width="100%"/>
-</p>
-
-1. **Live Telemetry Collection:** `SuricataParser` tails `runtime/eve.json` in real time.
-2. **Zero Train/Serving Skew:** `collectors/feature_alignment.py` extracts the exact **12 network flow features** used during training.
-3. **Dual-Engine Detection:** **XGBoost** (`nids/ml.py`) classifies traffic across 6 classes (`Normal`, `Suspicious Port`, `Brute Force`, `Denial of Service`, `Web Attack`, `Botnet`) while **Deterministic Rules** (`nids/rules.py`) act as a resilient fallback.
-4. **Active Response & Visibility:** Threats are persisted in SQLite, streamed to the Web SOC Dashboard (`Dashboard`, `Alerts`, `Topology`, `Console`, `AI Models`), and enforced via `ResponseEngine`.
-
----
-
-## Reproducible AI Training Pipeline
-
-<p align="center">
-  <img src="./docs/assets/ai-training-flow.svg" alt="AI Training Pipeline" width="100%"/>
-</p>
-
 <details>
-<summary><b>Committee Deep-Dive: Why our ML pipeline has 0% Data Leakage &amp; Zero Serving Skew</b></summary>
+<summary><b>Committee Deep-Dive: Zero Data Leakage AI Training &amp; Architecture Details</b></summary>
 
 - **Dataset:** CICIDS2017 (`MachineLearningCVE`), streamed in `100,000`-row chunks.
-- **Deduplication Before Split:** Exact duplicates on the 12 features and cross-class collisions are removed *before* `train_test_split`, guaranteeing zero identical flow vectors appear in both train (`80%`) and test (`10%`).
-- **Leak-Free Preprocessing:** `SimpleImputer(strategy="median")` → `clip(>= 0)` → `log1p` → `StandardScaler` are fitted on the training split only.
+- **Zero Train/Serving Skew:** `collectors/feature_alignment.py` locks both training and live inference to the exact **12 flow features** Suricata produces in `eve.json`.
+- **Deduplication Before Split:** Exact duplicates on the 12 features and cross-class collisions are removed *before* `train_test_split` (`80%` train / `10%` val / `10%` test).
 - **Verified Test Metrics (`31,118` clean test rows):** `99.07%` Accuracy, `92.34%` Macro F1-Score (`AI/models/xgboost_nids_artifacts/metrics.json`).
 
 </details>
@@ -94,5 +81,5 @@ Open **`http://127.0.0.1:8080`** in your browser.
 
 ```bash
 # Inside either Linux_Support/ or Windows_Support/
-pytest tests
+python -m pytest tests
 ```

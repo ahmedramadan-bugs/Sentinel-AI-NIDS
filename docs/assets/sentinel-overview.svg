@@ -1,0 +1,150 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1080 560" width="100%">
+  <defs>
+    <linearGradient id="bgOv" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0b101b"/>
+      <stop offset="100%" stop-color="#11192b"/>
+    </linearGradient>
+    <pattern id="gridOv" width="24" height="24" patternUnits="userSpaceOnUse">
+      <circle cx="2" cy="2" r="1" fill="rgba(255,255,255,0.05)"/>
+    </pattern>
+    <marker id="arrWhite" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,1 L7,4 L0,7 Z" fill="#e2e8f0"/>
+    </marker>
+    <marker id="arrBlue" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,1 L7,4 L0,7 Z" fill="#38bdf8"/>
+    </marker>
+    <marker id="arrCoral" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto">
+      <path d="M0,1 L7,4 L0,7 Z" fill="#ef4444"/>
+    </marker>
+  </defs>
+
+  <style>
+    .flow-fast { stroke-dasharray: 6 6; animation: march 420ms linear infinite; }
+    .flow-rev  { stroke-dasharray: 6 6; animation: marchRev 420ms linear infinite; }
+    @keyframes march { to { stroke-dashoffset: -12; } }
+    @keyframes marchRev { to { stroke-dashoffset: 12; } }
+  </style>
+
+  <!-- Outer Frame -->
+  <rect width="1080" height="560" rx="16" fill="url(#bgOv)" stroke="#232c40" stroke-width="2"/>
+  <rect width="1080" height="560" rx="16" fill="url(#gridOv)"/>
+
+  <!-- ==================== LEFT COLUMN: INPUTS ==================== -->
+  <!-- Group 1: Network & Attack Sources -->
+  <text x="115" y="46" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI, sans-serif" font-size="13" font-weight="700">Network &amp; Attack Sources</text>
+
+  <!-- Card: Kali Linux -->
+  <rect x="42" y="62" width="146" height="56" rx="10" fill="#182135" stroke="#ef4444" stroke-width="1.6"/>
+  <rect x="54" y="76" width="24" height="18" rx="3" fill="#0f0709" stroke="#fca5a5" stroke-width="1.4"/>
+  <path d="M59 82 L63 85 L59 88 M65 88 H71" stroke="#ef4444" stroke-width="1.4" fill="none"/>
+  <text x="88" y="88" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700">Kali Console</text>
+  <text x="88" y="103" fill="#fca5a5" font-family="Consolas, monospace" font-size="9.5">Nmap • Hydra • DoS</text>
+
+  <!-- Card: Suricata EVE -->
+  <rect x="42" y="130" width="146" height="56" rx="10" fill="#182135" stroke="#38bdf8" stroke-width="1.6"/>
+  <circle cx="66" cy="158" r="10" fill="#0b1322" stroke="#38bdf8" stroke-width="1.5"/>
+  <circle cx="66" cy="158" r="4" fill="#38bdf8"/>
+  <text x="86" y="155" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700">Suricata IDS</text>
+  <text x="86" y="170" fill="#7dd3fc" font-family="Consolas, monospace" font-size="9.5">runtime/eve.json</text>
+
+  <!-- Card: Live Flows -->
+  <rect x="42" y="198" width="146" height="56" rx="10" fill="#182135" stroke="#00d9c0" stroke-width="1.6"/>
+  <path d="M56 226 L62 220 L68 232 L74 222 L78 226" fill="none" stroke="#00d9c0" stroke-width="1.8"/>
+  <text x="88" y="223" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700">Live Flows</text>
+  <text x="88" y="238" fill="#00d9c0" font-family="Consolas, monospace" font-size="9.5">TCP • UDP • HTTP</text>
+
+  <!-- Curly Brace 1 -->
+  <path d="M 196 68 C 210 68, 206 158, 220 158 C 206 158, 210 248, 196 248" fill="none" stroke="#64748b" stroke-width="2.2"/>
+
+  <!-- Group 2: Detection Inputs -->
+  <text x="115" y="318" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI, sans-serif" font-size="13" font-weight="700">Detection Inputs</text>
+
+  <!-- Card: 12-Feature Vector -->
+  <rect x="42" y="334" width="146" height="58" rx="10" fill="#182135" stroke="#00d9c0" stroke-width="1.6"/>
+  <text x="115" y="358" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700">12 Flow Features</text>
+  <text x="115" y="375" text-anchor="middle" fill="#00d9c0" font-family="Consolas, monospace" font-size="9.5">Zero Serving Skew</text>
+
+  <!-- Card: Deterministic Rules -->
+  <rect x="42" y="406" width="146" height="58" rx="10" fill="#182135" stroke="#38bdf8" stroke-width="1.6"/>
+  <text x="115" y="430" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700">Suricata Rules</text>
+  <text x="115" y="447" text-anchor="middle" fill="#7dd3fc" font-family="Consolas, monospace" font-size="9.5">Signature Fallback</text>
+
+  <!-- Curly Brace 2 -->
+  <path d="M 196 340 C 210 340, 206 400, 220 400 C 206 400, 210 460, 196 460" fill="none" stroke="#64748b" stroke-width="2.2"/>
+
+  <!-- ==================== CENTER: CORE ENGINE ==================== -->
+  <rect x="330" y="162" width="270" height="220" rx="18" fill="#111826" stroke="#00d9c0" stroke-width="2.4"/>
+  <rect x="330" y="162" width="270" height="6" rx="3" fill="#00d9c0"/>
+
+  <!-- Shield + AI Core Emblem -->
+  <circle cx="465" cy="236" r="38" fill="#0c1524" stroke="rgba(0,217,192,0.5)" stroke-width="2"/>
+  <path d="M465 208 L488 218 V236 C488 251 478 261 465 266 C452 261 442 251 442 236 V218 Z" fill="rgba(0,217,192,0.16)" stroke="#00d9c0" stroke-width="2.4"/>
+  <path d="M455 236 L462 243 L476 227" fill="none" stroke="#33c777" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/>
+
+  <text x="465" y="302" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="19" font-weight="800">Sentinel-AI Engine</text>
+  <text x="465" y="324" text-anchor="middle" fill="#00d9c0" font-family="Consolas, monospace" font-size="11" font-weight="700">nids/pipeline.py  •  Correlator</text>
+  <text x="465" y="352" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI, sans-serif" font-size="11.5">Detects unwanted behaviors</text>
+  <text x="465" y="368" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI, sans-serif" font-size="11.5">&amp; blocks malicious IPs</text>
+
+  <!-- ==================== RIGHT COLUMN: AI, CONSOLE, REMEDIATION ==================== -->
+  <!-- Top Right: XGBoost AI Engine -->
+  <rect x="740" y="38" width="295" height="122" rx="14" fill="#0f2922" stroke="#33c777" stroke-width="2"/>
+  <text x="887" y="64" text-anchor="middle" fill="#86efac" font-family="Consolas, monospace" font-size="11.5" font-weight="700">XGBOOST ML ENGINE</text>
+  <text x="887" y="88" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="15" font-weight="700">6-Class Flow Classifier</text>
+  <text x="887" y="112" text-anchor="middle" fill="#cbd5e1" font-family="Consolas, monospace" font-size="10.5">Normal • PortScan • BruteForce</text>
+  <text x="887" y="129" text-anchor="middle" fill="#cbd5e1" font-family="Consolas, monospace" font-size="10.5">DoS/DDoS • WebAttack • Botnet</text>
+  <text x="887" y="148" text-anchor="middle" fill="#33c777" font-family="Consolas, monospace" font-size="10" font-weight="700">92.34% Macro F1  |  99.07% Acc</text>
+
+  <!-- Middle Right: Live Web SOC Console -->
+  <rect x="740" y="192" width="295" height="150" rx="14" fill="#111826" stroke="#38bdf8" stroke-width="2"/>
+  <text x="887" y="216" text-anchor="middle" fill="#7dd3fc" font-family="Consolas, monospace" font-size="11.5" font-weight="700">NIDS.CONSOLE (WEB SOC)</text>
+  <!-- Mini UI rows -->
+  <rect x="758" y="228" width="259" height="24" rx="5" fill="#080b11" stroke="#1e293b"/>
+  <circle cx="770" cy="240" r="3.5" fill="#ef4444"/><text x="782" y="244" fill="#fecaca" font-family="Consolas, monospace" font-size="9.5">192.168.56.101  SSH Brute Force</text>
+  <rect x="758" y="258" width="259" height="24" rx="5" fill="#080b11" stroke="#1e293b"/>
+  <circle cx="770" cy="270" r="3.5" fill="#f5943a"/><text x="782" y="274" fill="#fed7aa" font-family="Consolas, monospace" font-size="9.5">203.0.113.45    Denial of Service</text>
+  <rect x="758" y="288" width="259" height="24" rx="5" fill="#080b11" stroke="#1e293b"/>
+  <circle cx="770" cy="300" r="3.5" fill="#33c777"/><text x="782" y="304" fill="#86efac" font-family="Consolas, monospace" font-size="9.5">192.168.56.10   ONLINE (Protected)</text>
+  <text x="887" y="330" text-anchor="middle" fill="#94a3b8" font-family="Segoe UI, sans-serif" font-size="10">Dashboard • Alerts • Devices • Console</text>
+
+  <!-- Bottom Right: Remediation 2x2 Grid -->
+  <text x="887" y="376" text-anchor="middle" fill="#fca5a5" font-family="Consolas, monospace" font-size="12" font-weight="700">ACTIVE REMEDIATION</text>
+  <rect x="740" y="388" width="142" height="58" rx="10" fill="#182135" stroke="#ef4444" stroke-width="1.5"/>
+  <text x="811" y="414" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700">Linux iptables</text>
+  <text x="811" y="431" text-anchor="middle" fill="#fca5a5" font-family="Consolas, monospace" font-size="9.5">NIDS_DROP Chain</text>
+
+  <rect x="893" y="388" width="142" height="58" rx="10" fill="#182135" stroke="#38bdf8" stroke-width="1.5"/>
+  <text x="964" y="414" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700">Windows netsh</text>
+  <text x="964" y="431" text-anchor="middle" fill="#7dd3fc" font-family="Consolas, monospace" font-size="9.5">Host Firewall</text>
+
+  <rect x="740" y="456" width="142" height="58" rx="10" fill="#182135" stroke="#f5943a" stroke-width="1.5"/>
+  <text x="811" y="482" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700">Cisco Switch</text>
+  <text x="811" y="499" text-anchor="middle" fill="#fdba74" font-family="Consolas, monospace" font-size="9.5">SSH ACL Block</text>
+
+  <rect x="893" y="456" width="142" height="58" rx="10" fill="#182135" stroke="#33c777" stroke-width="1.5"/>
+  <text x="964" y="482" text-anchor="middle" fill="#f8fafc" font-family="Segoe UI, sans-serif" font-size="12" font-weight="700">Safe Dry-Run</text>
+  <text x="964" y="499" text-anchor="middle" fill="#86efac" font-family="Consolas, monospace" font-size="9.5">Committee Demo</text>
+
+  <!-- ==================== ANIMATED MARCHING-ANTS ARROWS ==================== -->
+  <!-- Left -> Center -->
+  <path class="flow-fast" d="M 222 158 C 275 158, 275 235, 326 235" fill="none" stroke="#e2e8f0" stroke-width="2.4" marker-end="url(#arrWhite)"/>
+  <text x="270" y="176" text-anchor="middle" fill="#cbd5e1" font-family="Segoe UI, sans-serif" font-size="10.5" font-weight="600">Parse events</text>
+
+  <path class="flow-fast" d="M 222 400 C 275 400, 275 315, 326 315" fill="none" stroke="#e2e8f0" stroke-width="2.4" marker-end="url(#arrWhite)"/>
+  <text x="270" y="388" text-anchor="middle" fill="#cbd5e1" font-family="Segoe UI, sans-serif" font-size="10.5" font-weight="600">Align &amp; match</text>
+
+  <!-- Center <-> Top Right (Blue & Coral opposing arrows like CrowdSec) -->
+  <path class="flow-fast" d="M 602 215 C 660 190, 665 110, 735 88" fill="none" stroke="#38bdf8" stroke-width="2.4" marker-end="url(#arrBlue)"/>
+  <text x="658" y="132" text-anchor="middle" fill="#7dd3fc" font-family="Segoe UI, sans-serif" font-size="10.5" font-weight="700">12-feature vector</text>
+
+  <path class="flow-fast" d="M 735 128 C 675 148, 670 220, 606 242" fill="none" stroke="#ef4444" stroke-width="2.4" marker-end="url(#arrCoral)"/>
+  <text x="676" y="182" text-anchor="middle" fill="#fca5a5" font-family="Segoe UI, sans-serif" font-size="10.5" font-weight="700">Threat prediction</text>
+
+  <!-- Center -> Middle Right (Console) -->
+  <path class="flow-fast" d="M 602 272 L 735 272" fill="none" stroke="#38bdf8" stroke-width="2.4" marker-end="url(#arrBlue)"/>
+  <text x="668" y="262" text-anchor="middle" fill="#7dd3fc" font-family="Segoe UI, sans-serif" font-size="10.5" font-weight="700">Stream alerts &amp; status</text>
+
+  <!-- Center -> Bottom Right (Block bad IPs) -->
+  <path class="flow-fast" d="M 602 325 C 665 340, 670 420, 735 440" fill="none" stroke="#ef4444" stroke-width="2.6" marker-end="url(#arrCoral)"/>
+  <text x="662" y="405" text-anchor="middle" fill="#fca5a5" font-family="Segoe UI, sans-serif" font-size="11" font-weight="700">Block bad IPs</text>
+</svg>
