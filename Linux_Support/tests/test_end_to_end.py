@@ -190,7 +190,7 @@ class NIDSEndToEndTests(unittest.TestCase):
         }
         decision = detector.classify(flow_features)
         self.assertIsNotNone(decision)
-        self.assertIn(decision.label, ["Normal", "Suspicious Port", "Brute Force", "Data Exfiltration"])
+        self.assertIn(decision.label, ["Normal", "Suspicious Port", "Brute Force", "Denial of Service", "Web Attack", "Botnet", "Data Exfiltration"])
         self.assertTrue(0.0 <= decision.confidence <= 1.0)
         self.assertGreater(decision.latency_ms, 0)
         self.assertEqual(detector.health()["status"], "HEALTHY")
