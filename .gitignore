@@ -10,8 +10,8 @@ venv/
 ENV/
 
 # Temporary / Runtime data (keep runtime/static for offline UI assets)
-runtime/*
-!runtime/static/
+**/runtime/*
+!**/runtime/static/
 response_engine/logs/*.log
 .python-runtime/
 python-runtime.zip
