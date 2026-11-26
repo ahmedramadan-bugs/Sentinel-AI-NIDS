@@ -1,6 +1,6 @@
 @echo off
 title Sentinel-AI NIDS (Windows Support)
-cd /d "%~dp0"
+cd /d "%~dp0..\.."
 
 if not exist ".venv\Scripts\python.exe" (
     echo [1/3] Creating Python virtual environment...

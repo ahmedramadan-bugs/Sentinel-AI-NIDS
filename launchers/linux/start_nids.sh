@@ -5,7 +5,7 @@ echo "======================================================"
 echo "   NIDS - Network Intrusion Detection & Response      "
 echo "======================================================"
 
-PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 cd "$PROJECT_DIR"
 
 # Capture interfaces — override via NIDS_CAPTURE_INTERFACES (space-separated)

@@ -1,6 +1,6 @@
 ﻿# Sentinel-AI NIDS — Windows Launcher
 $ErrorActionPreference = "Stop"
-Set-Location $PSScriptRoot
+Set-Location (Resolve-Path (Join-Path $PSScriptRoot "..\.."))
 
 if (-not (Test-Path ".venv\Scripts\python.exe")) {
     Write-Host "[1/3] Creating virtual environment (.venv)..." -ForegroundColor Cyan
